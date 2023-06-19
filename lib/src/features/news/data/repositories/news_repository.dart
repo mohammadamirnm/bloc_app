@@ -4,18 +4,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../entities/news.dart';
 
 class NewsRepository {
-  final CollectionReference collection =
-      FirebaseFirestore.instance.collection('news');
+  final FirebaseFirestore _instance = FirebaseFirestore.instance;
 
-  Stream<QuerySnapshot> getStream() {
+  Stream<List<News>> getStream() {
     try {
-      return collection.snapshots();
+      CollectionReference<Map<String, dynamic>> collection =
+          FirebaseFirestore.instance.collection('news');
+      return collection.snapshots().map(
+          (QuerySnapshot<Map<String, dynamic>> event) => event.docs
+              .map((QueryDocumentSnapshot<Map<String, dynamic>> doc) =>
+                  News.fromJson(doc.data()))
+              .toList());
     } catch (_) {
       throw NewsException();
     }
   }
 
   Future<void> updateNews(News news) async {
-    await collection.doc(news.id).set(news.toJson());
+    await _instance.collection('news').doc(news.id).set(news.toJson());
   }
 }

@@ -18,8 +18,8 @@ class NewsCubit extends Cubit<NewsState> {
   Future<void> initStream() async {
     try {
       _newsRepository.getStream().listen(
-        (QuerySnapshot<List<News>> snapshot) async {
-          fetchNews(snapshot);
+        (List<News> news) async {
+          fetchNews(news);
         },
       );
     } on NewsException catch (newsException) {
@@ -29,14 +29,10 @@ class NewsCubit extends Cubit<NewsState> {
     }
   }
 
-  void fetchNews(QuerySnapshot<List<News>> snapshot) {
+  void fetchNews(List<News> news) {
     // This is in case it was a query taking time.
     emit(const NewsState.loading());
 
-    // final List<News> news = snapshot.docs
-    //     .map((QueryDocumentSnapshot<News> doc) => doc.data())
-    //     .toList();
-
-    // emit(NewsState.loaded(news));
+    emit(NewsState.loaded(news));
   }
 }
